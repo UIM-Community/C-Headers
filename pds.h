@@ -3,13 +3,11 @@
 * Copyrights (c) Nimbus Software AS.
 ********************************************************************/
 
-#include <stdlib.h>
-#include <time.h>
-#include<stdarg.h>
-#include<stdio.h>
-
 #ifndef __pds_h
 #define __pds_h
+
+#include <stdarg.h>
+#include <stdio.h>
 
 #ifndef True
 #define True 1
@@ -97,9 +95,9 @@ typedef struct PDSC {
 
 /* STRUCTURE FOR PDS-HANDLE */
 typedef struct PDS {
-	size_t	total;
-	size_t	size;
-	size_t	osize;			/* original size - pdsCreateSize or default: 1024 */
+	unsigned int	total;
+	unsigned int	size;
+	unsigned int	osize;			/* original size - pdsCreateSize or default: 1024 */
 	char	*get,*put;
 	char	*data;
 	PDSI	*keys;
@@ -124,6 +122,7 @@ typedef struct PDSINT64 {
 
 #ifdef WIN32
 #define mylseek    _lseeki64
+#define myseekpos  __int64
 #define mytell     _telli64
 #else
 #define mylseek    lseek
@@ -132,7 +131,7 @@ typedef struct PDSINT64 {
 #endif
 
 typedef struct _pds_header {
-	long read_pos;
+	myseekpos read_pos;
 	unsigned long records;
 } PDSHEADER;
 
@@ -155,10 +154,10 @@ extern "C" {
 	extern int		pdsDelete 	(PDS *pds);
 	extern int		pdsCount  	(PDS *pds);
 	extern PDS*		pdsCreate 	(void);
-	extern PDS*		pdsCreateSize   (size_t size);
-	extern PDS*		pdsMap	  	(PDS *pds,char *szDta, size_t iSize);
-	extern PDS*		pdsSet	  	(char *szDta, size_t iSize);
-	extern PDS      *pdsSetBuffer(char *pchData,size_t iSize, int bFreeBuffer);
+	extern PDS*		pdsCreateSize   (unsigned int size);
+	extern PDS*		pdsMap	  	(PDS *pds,char *szDta, unsigned int iSize);
+	extern PDS*		pdsSet	  	(char *szDta, unsigned int iSize);
+	extern PDS      *pdsSetBuffer(char *pchData,unsigned int iSize, int bFreeBuffer);
 	extern int		pdsRemove   (PDS *pds, char *matchKey);
 	extern int		pdsRewind   (PDS *pds);
 	extern int		pdsReset    (PDS *pds);
@@ -170,10 +169,10 @@ extern "C" {
 	extern void		pdsFreeTable(PDStype t, void **val);
 	extern int 		pdsGetTable (PDS *pds,PDStype t,char *key,int i,void *val);
 	extern int 		pdsPutTable (PDS *pds,PDStype t,char *key,void *val);
-	extern int		pdsPut	  	(PDS *pds,PDStype t,char *key,void *d,size_t l);
+	extern int		pdsPut	  	(PDS *pds,PDStype t,char *key,void *d,unsigned int l);
 	extern int		pdsGet	  	(PDS *pds,PDStype t,char *key,void *d);
 	extern void*	pdsGetData 	(PDS *pds,char *key,PDStype t);
-	extern int		pdsGetNext  (PDS *pds,char **pKey,PDStype *pT,size_t *pS,void **pD);
+	extern int		pdsGetNext  (PDS *pds,char **pKey,PDStype *pT,unsigned int *pS,void **pD);
 	extern int		pdsDump		(PDS *pds);
 	extern char*	pdsExpand   (PDS *pds,char *format,...);	/* optional par: char *missing_value */
 	extern int		pdsCfgRead  (char *fname,PDS **out);
@@ -190,8 +189,8 @@ extern "C" {
 	extern int 		pdsGet_PPDS (PDS *pds, char *key, PDS ***pppPds);
 	extern int		pdsGet_PDS	(PDS *pds, char *key, PDS **ppds);
 	extern int      pdsGet_CPDS (PDS *pds, char *key, PDS **ppPds);
-	extern int		pdsGet_VOID	(PDS *pds, char *key, void **ppd, size_t *lsz);
-	extern int		pdsGet_RGCH	(PDS *pds, char *key, char *pch,size_t size);
+	extern int		pdsGet_VOID	(PDS *pds, char *key, void **ppd, unsigned int *lsz);
+	extern int		pdsGet_RGCH	(PDS *pds, char *key, char *pch,unsigned int size);
 	extern int		pdsGet_CPCH (PDS *pds, char *key, char **ppch);
 	extern int		pdsGet_PCH	(PDS *pds, char *key, char **ppch);
 	extern int		pdsGet_PPCH	(PDS *pds, char *key, char ***pppch);
@@ -202,12 +201,12 @@ extern "C" {
 	extern int		pdsGet_PL	(PDS *pds, char *key, long **ppl);
 	extern int		pdsGet_F	(PDS *pds, char *key, double *pd);
 	extern int		pdsGet_TIME	(PDS *pds, char *key, time_t *pt);
-	extern int		pdsGet_SIZE	(PDS *pds, char *key, size_t *ps);
+	extern int		pdsGet_SIZE	(PDS *pds, char *key, unsigned int *ps);
 
 	extern int 		pdsPut_PDS 	(PDS *pds, char *key, PDS *dpds);
 	extern int 		pdsPut_PPDS (PDS *pds, char *key, PDS *dpds);
-	extern int 		pdsPut_VOID	(PDS *pds, char *key, void *d, size_t size);
-	extern int 		pdsPut_RGCH	(PDS *pds, char *key, char *pch, size_t size);
+	extern int 		pdsPut_VOID	(PDS *pds, char *key, void *d, unsigned int size);
+	extern int 		pdsPut_RGCH	(PDS *pds, char *key, char *pch, unsigned int size);
 	extern int 		pdsPut_PCH 	(PDS *pds, char *key, char *pch);
 	extern int 		pdsPut_PPCH	(PDS *pds, char *key, char **ppch);
 	extern int 		pdsPut_INT 	(PDS *pds, char *key, int i);
@@ -217,7 +216,7 @@ extern "C" {
 	extern int 		pdsPut_PPL 	(PDS *pds, char *key, long *ppl);
 	extern int 		pdsPut_F   	(PDS *pds, char *key, double d);
 	extern int 		pdsPut_TIME   	(PDS *pds, char *key, time_t t);
-	extern int 		pdsPut_SIZE   	(PDS *pds, char *key, size_t s);
+	extern int 		pdsPut_SIZE   	(PDS *pds, char *key, unsigned int s);
 
 #ifdef NIMEXTERNC
 };
